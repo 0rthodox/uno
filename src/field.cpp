@@ -49,7 +49,7 @@ field::field() : main_deck(), source_deck(), players() {
     std::cin >> c_a;
     if (c_a <= 15)
         break;
-    std::cout << "Sorry, but this is too big (like long long long int for GCC)" << std::endl;
+    std::cout << "Sorry, but this is too big for me" << std::endl;
     }
     std::cout << "Please input the amount of players and their names:" << std::endl;
     std::cin >> p_a;
