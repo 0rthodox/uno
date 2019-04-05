@@ -256,3 +256,15 @@ void field::gameloop() {
         curr_player = next_player();
     }
 }
+
+void field::new_gameloop() {
+    sf::Window main_window(sf::VideoMode(800, 600), "My window");
+    while(main_window.isOpen()) {
+        sf::Event close_event;
+        while (main_window.pollEvent(close_event)) {
+            // "close requested" event: we close the window
+            if (close_event.type == sf::Event::Closed)
+                main_window.close();
+        }
+    }
+}

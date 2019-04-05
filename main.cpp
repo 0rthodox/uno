@@ -3,6 +3,6 @@
 int main()
 {
     field f;
-    f.gameloop();
+    f.new_gameloop();
     return 0;
 }

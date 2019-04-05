@@ -30,6 +30,7 @@ class field {
 public:
     field();
     void gameloop();
+    void new_gameloop();
 };
 
 #endif // FIELD_H
