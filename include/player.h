@@ -12,7 +12,7 @@ class player : public base_deck
         void reset_special();
         void output_cards(sf::RenderWindow & rw, bool is_empty);
         void new_output(sf::RenderWindow & rw, sf::Vector2u position, std::vector<std::list<card*>::iterator> & displayed);
-
+        short check_mouse(const sf::Vector2i & m_coord);
     protected:
 
     private:

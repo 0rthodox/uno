@@ -1,5 +1,23 @@
 #include "field.h"
-#include "T9.h"
+#include <set>
+
+float similar(const std::string & lhs, const std::string & rhs) {
+    unsigned res = 0;
+    std::multiset<char> lhs_set;
+    for(const auto & item : lhs)
+        lhs_set.insert(item);
+    std::multiset<char> rhs_set;
+    for(const auto & item : rhs)
+        rhs_set.insert(item);
+    for(auto item : rhs_set) {
+        auto it = lhs_set.find(item);
+        if (it != lhs_set.end()) {
+            lhs_set.erase(it);
+            res++;
+        }
+    }
+    return res / (float)rhs_set.size();
+}
 
 std::string make_big(std::string & s) {
     for(auto & c : s)
@@ -170,7 +188,7 @@ void field::affect(const card * s_c) {
         curr_player = next_player();
 }
 
-void field::new_window() {
+std::string field::new_window() {
     sf::RenderWindow window(sf::VideoMode::getFullscreenModes()[0], "Beta window");
     sf::Vector2u size = window.getSize();
     unsigned int width = size.x;
@@ -178,39 +196,47 @@ void field::new_window() {
     std::vector<std::list<card*>::iterator> displayed;
     while(window.isOpen()) {
         sf::Event event;
-        while (window.pollEvent(event)) {
-            switch (event.type)
-        {
-        // window closed
-            case sf::Event::Closed:
-                window.close();
-                break;
-
-            case sf::Event::MouseButtonPressed:
-                std::cout << "Button";
-                break;
-
-            default:
-                break;
-    }
-        }
         window.clear(sf::Color::White);
-        float x = 0.67 * (height - 250);
-        sf::CircleShape field_circle(x / 2);
+        sf::CircleShape field_circle(125);
         field_circle.setFillColor(sf::Color(255, 198, 24));
-        field_circle.setPosition((width - x) / 2, (height - 250 - x) / 2);
+        field_circle.setPosition((width - 250) / 2, (height - 1000) / 2);
         window.draw(field_circle);
+        if(!main_deck.empty()) {
+            main_deck.top()->setPosition(field_circle.getPosition().x + 55, field_circle.getPosition().y + 15);
+            window.draw(main_deck.top()->get_sprite());
+        }
         sf::CircleShape card_circle(125.f);
         card_circle.setFillColor(sf::Color(47, 69, 56, 240));
-        card_circle.setPosition(0, float(height - 250));
-        for(int i = 0; i < 7; ++i) {
-            card_circle.move(float(width) / 7 * (i != 0), 0);
-            window.draw(card_circle);
+        for(int k = 0; k < 3; ++k) {
+            card_circle.setPosition(0, float(height - 250 * (3 - k)));
+            for(int i = 0; i < 5; ++i) {
+                card_circle.move(float(width) / 5 * (i != 0), 0);
+                window.draw(card_circle);
+            }
         }
-        curr_player->new_output(window, sf::Vector2u(56, height - 230), displayed);
+        curr_player->new_output(window, sf::Vector2u(55, height - 730), displayed);
+
+
+        while(window.pollEvent(event)) {
+            if(event.type == sf::Event::Closed)
+                window.close();
+            else if(event.type == sf::Event::MouseButtonPressed) {
+                std::cout << "BUTTON" << std::endl;
+                short at_card = curr_player->check_mouse(sf::Mouse::getPosition(window));
+                std::cout << at_card << std::endl;
+                if(at_card) {
+                std::cout << "Got the card with number " << at_card / 10 << " and color " << at_card % 10 << std::endl;
+                window.close();
+                if(put(at_card / 10, at_card % 10))
+                    return "PASS";
+                    break;
+                }
+            }
+
+        }
         window.display();
     }
-
+    return "PASS";
 }
 
 void field::gameloop() {
@@ -227,7 +253,7 @@ void field::gameloop() {
         while(command != "PASS" || similar(command, "PASS") < 0.7) {
             std::cin >> command;
             command = make_big(command);
-            if(command == "INFO") {
+            if(command == "INFO" || similar(command, "INFO") < 0.7) {
                 std::cout << "Available commands:" << std::endl;
                 std::cout << "FIELD to look at field" << std::endl;
                 std::cout << "CHECK to check your cards" << std::endl;
@@ -246,7 +272,7 @@ void field::gameloop() {
                 std::cin >> amount;
                 take(amount);
             }
-            else if(command == "PUT" || similar(command, "PUT") >= 0.7) {
+            else if(command == "PUT" || similar(command, "PUT") >= 0.6) {
                 short color = 5, number = 15;
                 std::string color_s, number_s;
                 std::cin >> color_s;
@@ -286,8 +312,11 @@ void field::gameloop() {
                 reshuffle();
             else if(command == "SOURCE" || similar(command, "SOURCE") >= 0.7)
                 check_source();
-            else if(command == "WINDOW" || similar(command, "WINDOW") >= 0.7)
-                new_window();
+            else if(command == "WINDOW" || similar(command, "WINDOW") >= 0.7) {
+                field_window.close();
+                command = new_window();
+            }
+
         }
         field_window.close();
         system("pause");

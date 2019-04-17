@@ -27,7 +27,7 @@ class field {
     void affect(const card * s_c);
     void reshuffle();
     void check_source();
-    void new_window();
+    std::string new_window();
 public:
     field();
     void gameloop();

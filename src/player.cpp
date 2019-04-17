@@ -47,13 +47,20 @@ void player::reset_special() {
 void player::new_output(sf::RenderWindow & rw, sf::Vector2u position, std::vector<std::list<card*>::iterator> & displayed) {
     unsigned xpos = position.x;
     unsigned ypos = position.y;
-    short i = 0, k;
+    short k = 0;
     auto it = cards.begin();
-    for(k = i; k < i + 5; ++k) {
-        (*it)->setPosition(xpos + float(rw.getSize().x) / 7 * (k % 5 + 1), ypos);
+    for(auto it = cards.begin(); it != cards.end(); ++it) {
+        (*it)->setPosition(xpos + float(rw.getSize().x) / 5 * (k % 5), ypos + 250 * (k / 5));
         rw.draw((*it)->get_sprite());
         displayed.push_back(it);
-        ++it;
-        std::cout << "card drown at" << xpos + 250 * (k % 5) << " " << ypos << " " << k << std::endl;
+        ++k;
     }
+}
+
+short player::check_mouse(const sf::Vector2i & m_coord) {
+    for(const auto & card : cards) {
+        if (card->get_sprite().getGlobalBounds().contains(m_coord.x, m_coord.y))
+            return (int)card->get_number() * 10 + card->get_color();
+    }
+    return 0;
 }
