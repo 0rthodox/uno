@@ -11,6 +11,7 @@ class player : public base_deck
         short find(short number, short color, short new_active_color);
         void reset_special();
         void output_cards(sf::RenderWindow & rw, bool is_empty);
+        void new_output(sf::RenderWindow & rw, sf::Vector2u position, std::vector<std::list<card*>::iterator> & displayed);
 
     protected:
 

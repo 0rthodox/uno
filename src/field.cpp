@@ -1,4 +1,5 @@
 #include "field.h"
+#include "T9.h"
 
 std::string make_big(std::string & s) {
     for(auto & c : s)
@@ -7,15 +8,15 @@ std::string make_big(std::string & s) {
 }
 
 short determine_color(std::string & color_s) {
-    if(color_s == "RED")
+    if(color_s == "RED" || similar(color_s, "TAKE") >= 0.6)
         return 0;
-    else if(color_s == "YELLOW")
+    else if(color_s == "YELLOW" || similar(color_s, "TAKE") >= 0.7)
         return 1;
-    else if(color_s == "GREEN")
+    else if(color_s == "GREEN" || similar(color_s, "TAKE") >= 0.7)
         return 2;
-    else if(color_s == "BLUE")
+    else if(color_s == "BLUE" || similar(color_s, "TAKE") >= 0.7)
         return 3;
-    else if(color_s == "BLACK")
+    else if(color_s == "BLACK" || similar(color_s, "TAKE") >= 0.7)
         return 4;
     return -1;
 }
@@ -162,14 +163,55 @@ void field::affect(const card * s_c) {
     else if(num == 11)
         reversed = !reversed;
     else if(num == 12)
-        next_player()->transfer(source_deck, 0 , 2);
+        next_player()->transfer(source_deck, 0, 2);
     else if(num == 14)
         next_player()->transfer(source_deck, 0, 4);
     if(num == 12 || num == 14)
         curr_player = next_player();
 }
 
+void field::new_window() {
+    sf::RenderWindow window(sf::VideoMode::getFullscreenModes()[0], "Beta window");
+    sf::Vector2u size = window.getSize();
+    unsigned int width = size.x;
+    unsigned int height = size.y;
+    std::vector<std::list<card*>::iterator> displayed;
+    while(window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            switch (event.type)
+        {
+        // window closed
+            case sf::Event::Closed:
+                window.close();
+                break;
 
+            case sf::Event::MouseButtonPressed:
+                std::cout << "Button";
+                break;
+
+            default:
+                break;
+    }
+        }
+        window.clear(sf::Color::White);
+        float x = 0.67 * (height - 250);
+        sf::CircleShape field_circle(x / 2);
+        field_circle.setFillColor(sf::Color(255, 198, 24));
+        field_circle.setPosition((width - x) / 2, (height - 250 - x) / 2);
+        window.draw(field_circle);
+        sf::CircleShape card_circle(125.f);
+        card_circle.setFillColor(sf::Color(47, 69, 56, 240));
+        card_circle.setPosition(0, float(height - 250));
+        for(int i = 0; i < 7; ++i) {
+            card_circle.move(float(width) / 7 * (i != 0), 0);
+            window.draw(card_circle);
+        }
+        curr_player->new_output(window, sf::Vector2u(56, height - 230), displayed);
+        window.display();
+    }
+
+}
 
 void field::gameloop() {
     while (!curr_player->empty()) {
@@ -182,7 +224,7 @@ void field::gameloop() {
         check();
         std::cout << "Please input your command // INFO to learn about the commands" << std::endl;
         std::string command;
-        while(command != "PASS") {
+        while(command != "PASS" || similar(command, "PASS") < 0.7) {
             std::cin >> command;
             command = make_big(command);
             if(command == "INFO") {
@@ -195,15 +237,16 @@ void field::gameloop() {
                 std::cout << "SOURCE to count the cards available in the source deck" << std::endl;
                 std::cout << "PASS to pass your turn" << std::endl;
                 std::cout << "RESHUFFLE to reshuffle the main deck" << std::endl;
+                std::cout << "WINDOW to enter full window mode" << std::endl;
             }
-            if(command == "FIELD")
+            if(command == "FIELD" || similar(command, "FIELD") >= 0.7)
                 check_field();
-            else if(command == "TAKE") {
+            else if(command == "TAKE" || similar(command, "TAKE") >= 0.7) {
                 short amount;
                 std::cin >> amount;
                 take(amount);
             }
-            else if(command == "PUT") {
+            else if(command == "PUT" || similar(command, "PUT") >= 0.7) {
                 short color = 5, number = 15;
                 std::string color_s, number_s;
                 std::cin >> color_s;
@@ -211,11 +254,11 @@ void field::gameloop() {
                 color_s = make_big(color_s);
                 number_s = make_big(number_s);
                 color = determine_color(color_s);
-                if(number_s == "CHANGE") {
+                if(number_s == "CHANGE" || similar(command, "CHANGE") >= 0.7) {
                     number = 13;
                     std::cin >> number_s;
                 }
-                else if(number_s == "PLUS") {
+                else if(number_s == "PLUS" || similar(command, "PLUS") >= 0.7) {
                     short number_2;
                     std::cin >> number_2;
                     if(number_2 == 2)
@@ -223,9 +266,9 @@ void field::gameloop() {
                     else if(number_2 == 4)
                         number = 14;
                 }
-                else if(number_s == "REVERSE")
+                else if(number_s == "REVERSE" || similar(command, "REVERSE") >= 0.7)
                     number = 11;
-                else if(number_s == "TURN") {
+                else if(number_s == "TURN" || similar(command, "TURN") >= 0.7) {
                     std::cin >> number_s;
                     number = 10;
                 }
@@ -237,12 +280,14 @@ void field::gameloop() {
                         affect(main_deck.top());
                 }
             }
-            else if(command == "CHECK")
+            else if(command == "CHECK" || similar(command, "CHECK") >= 0.7)
                 check();
-            else if(command == "RESHUFFLE")
+            else if(command == "RESHUFFLE" || similar(command, "RESHUFFLE") >= 0.7)
                 reshuffle();
-            else if(command == "SOURCE")
+            else if(command == "SOURCE" || similar(command, "SOURCE") >= 0.7)
                 check_source();
+            else if(command == "WINDOW" || similar(command, "WINDOW") >= 0.7)
+                new_window();
         }
         field_window.close();
         system("pause");

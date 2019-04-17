@@ -44,3 +44,16 @@ void player::reset_special() {
     }
 }
 
+void player::new_output(sf::RenderWindow & rw, sf::Vector2u position, std::vector<std::list<card*>::iterator> & displayed) {
+    unsigned xpos = position.x;
+    unsigned ypos = position.y;
+    short i = 0, k;
+    auto it = cards.begin();
+    for(k = i; k < i + 5; ++k) {
+        (*it)->setPosition(xpos + float(rw.getSize().x) / 7 * (k % 5 + 1), ypos);
+        rw.draw((*it)->get_sprite());
+        displayed.push_back(it);
+        ++it;
+        std::cout << "card drown at" << xpos + 250 * (k % 5) << " " << ypos << " " << k << std::endl;
+    }
+}
