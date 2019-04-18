@@ -1,7 +1,7 @@
 #include "field.h"
 #include <set>
 
-float similar(const std::string & lhs, const std::string & rhs) {
+bool similar(const std::string & lhs, const std::string & rhs) {
     unsigned res = 0;
     std::multiset<char> lhs_set;
     for(const auto & item : lhs)
@@ -16,7 +16,7 @@ float similar(const std::string & lhs, const std::string & rhs) {
             res++;
         }
     }
-    return res / (float)rhs_set.size();
+    return (res / (float)rhs_set.size() >= 0.66);
 }
 
 std::string make_big(std::string & s) {
@@ -26,15 +26,15 @@ std::string make_big(std::string & s) {
 }
 
 short determine_color(std::string & color_s) {
-    if(color_s == "RED" || similar(color_s, "TAKE") >= 0.6)
+    if(color_s == "RED" || similar(color_s, "RED"))
         return 0;
-    else if(color_s == "YELLOW" || similar(color_s, "TAKE") >= 0.7)
+    else if(color_s == "YELLOW" || similar(color_s, "YELLOW"))
         return 1;
-    else if(color_s == "GREEN" || similar(color_s, "TAKE") >= 0.7)
+    else if(color_s == "GREEN" || similar(color_s, "GREEN"))
         return 2;
-    else if(color_s == "BLUE" || similar(color_s, "TAKE") >= 0.7)
+    else if(color_s == "BLUE" || similar(color_s, "BLUE"))
         return 3;
-    else if(color_s == "BLACK" || similar(color_s, "TAKE") >= 0.7)
+    else if(color_s == "BLACK" || similar(color_s, "BLACK"))
         return 4;
     return -1;
 }
@@ -206,12 +206,12 @@ std::string field::new_window() {
             window.draw(main_deck.top()->get_sprite());
         }
         sf::CircleShape card_circle(125.f);
-        card_circle.setFillColor(sf::Color(47, 69, 56, 240));
+        card_circle.setFillColor(sf::Color(23, 114, 69, 240));
         for(int k = 0; k < 3; ++k) {
             card_circle.setPosition(0, float(height - 250 * (3 - k)));
             for(int i = 0; i < 5; ++i) {
-                card_circle.move(float(width) / 5 * (i != 0), 0);
                 window.draw(card_circle);
+                card_circle.move(float(width - 250) / 4 , 0);
             }
         }
         curr_player->new_output(window, sf::Vector2u(55, height - 730), displayed);
@@ -221,22 +221,22 @@ std::string field::new_window() {
             if(event.type == sf::Event::Closed)
                 window.close();
             else if(event.type == sf::Event::MouseButtonPressed) {
-                std::cout << "BUTTON" << std::endl;
                 short at_card = curr_player->check_mouse(sf::Mouse::getPosition(window));
-                std::cout << at_card << std::endl;
-                if(at_card) {
-                std::cout << "Got the card with number " << at_card / 10 << " and color " << at_card % 10 << std::endl;
                 window.close();
-                if(put(at_card / 10, at_card % 10))
+                if(put(at_card / 10, at_card % 10)) {
+                    std::cout << "put the card" << std::endl;
+                    if(players.size() != 1)
+                        affect(main_deck.top());
                     return "PASS";
-                    break;
                 }
+                std::cout << "failed to put the card" << std::endl;
+                return "WINDOW";
             }
 
         }
         window.display();
     }
-    return "PASS";
+    return "Easter is soon!";
 }
 
 void field::gameloop() {
@@ -248,31 +248,27 @@ void field::gameloop() {
         check_field();
         check_source();
         check();
+        //if (curr_player->size() == 1)
+            //UNO.transfer(source_deck, 0, 2);
         std::cout << "Please input your command // INFO to learn about the commands" << std::endl;
-        std::string command;
-        while(command != "PASS" || similar(command, "PASS") < 0.7) {
-            std::cin >> command;
-            command = make_big(command);
-            if(command == "INFO" || similar(command, "INFO") >= 0.7) {
-                std::cout << "Available commands:" << std::endl;
-                std::cout << "FIELD to look at field" << std::endl;
-                std::cout << "CHECK to check your cards" << std::endl;
-                std::cout << "TAKE 'n' to take some cards" << std::endl;
-                std::cout << "PUT to put a card on the field" << std::endl;
-                std::cout << "If card is black please add new color" << std::endl;
-                std::cout << "SOURCE to count the cards available in the source deck" << std::endl;
-                std::cout << "PASS to pass your turn" << std::endl;
-                std::cout << "RESHUFFLE to reshuffle the main deck" << std::endl;
-                std::cout << "WINDOW to enter full window mode" << std::endl;
+        std::string command = "WINDOW";
+        while(command != "PASS" && !similar(command, "PASS")) {
+            if(command != "WINDOW") {
+                std::cin >> command;
+                command = make_big(command);
             }
-            if(command == "FIELD" || similar(command, "FIELD") >= 0.7)
+            if(command == "WINDOW" || similar(command, "WINDOW")) {
+                field_window.close();
+                command = new_window();
+            }
+            else if(command == "FIELD" || similar(command, "FIELD"))
                 check_field();
-            else if(command == "TAKE" || similar(command, "TAKE") >= 0.7) {
+            else if(command == "TAKE" || similar(command, "TAKE")) {
                 short amount;
                 std::cin >> amount;
                 take(amount);
             }
-            else if(command == "PUT" || similar(command, "PUT") >= 0.6) {
+            else if(command == "PUT" || similar(command, "PUT")) {
                 short color = 5, number = 15;
                 std::string color_s, number_s;
                 std::cin >> color_s;
@@ -280,11 +276,11 @@ void field::gameloop() {
                 color_s = make_big(color_s);
                 number_s = make_big(number_s);
                 color = determine_color(color_s);
-                if(number_s == "CHANGE" || similar(command, "CHANGE") >= 0.7) {
+                if(number_s == "CHANGE" || similar(command, "CHANGE")) {
                     number = 13;
                     std::cin >> number_s;
                 }
-                else if(number_s == "PLUS" || similar(command, "PLUS") >= 0.7) {
+                else if(number_s == "PLUS" || similar(command, "PLUS")) {
                     short number_2;
                     std::cin >> number_2;
                     if(number_2 == 2)
@@ -292,9 +288,9 @@ void field::gameloop() {
                     else if(number_2 == 4)
                         number = 14;
                 }
-                else if(number_s == "REVERSE" || similar(command, "REVERSE") >= 0.7)
+                else if(number_s == "REVERSE" || similar(command, "REVERSE"))
                     number = 11;
-                else if(number_s == "TURN" || similar(command, "TURN") >= 0.7) {
+                else if(number_s == "TURN" || similar(command, "TURN")) {
                     std::cin >> number_s;
                     number = 10;
                 }
@@ -306,21 +302,34 @@ void field::gameloop() {
                         affect(main_deck.top());
                 }
             }
-            else if(command == "CHECK" || similar(command, "CHECK") >= 0.7)
+            else if(command == "CHECK" || similar(command, "CHECK"))
                 check();
-            else if(command == "RESHUFFLE" || similar(command, "RESHUFFLE") >= 0.7)
-                reshuffle();
-            else if(command == "SOURCE" || similar(command, "SOURCE") >= 0.7)
-                check_source();
-            else if(command == "WINDOW" || similar(command, "WINDOW") >= 0.7) {
-                field_window.close();
-                command = new_window();
+            else if(command == "UNO" || similar(command, "UNO")) {
+                //source_deck.transfer(UNO, 0, 2);
             }
+            else if(command == "RESHUFFLE" || similar(command, "RESHUFFLE"))
+                reshuffle();
+            else if(command == "SOURCE" || similar(command, "SOURCE"))
+                check_source();
 
+            else if(command == "INFO" || similar(command, "INFO")) {
+                std::cout << "Available commands:" << std::endl;
+                std::cout << "FIELD to look at field" << std::endl;
+                std::cout << "CHECK to check your cards" << std::endl;
+                std::cout << "TAKE 'n' to take some cards" << std::endl;
+                std::cout << "PUT to put a card on the field" << std::endl;
+                std::cout << "If card is black please add new color" << std::endl;
+                std::cout << "SOURCE to count the cards available in the source deck" << std::endl;
+                std::cout << "PASS to pass your turn" << std::endl;
+                std::cout << "RESHUFFLE to reshuffle the main deck" << std::endl;
+                std::cout << "WINDOW to enter full window mode" << std::endl;
+                std::cout << "UNO to say 'UNO'!" << std::endl;
+            }
         }
         field_window.close();
         system("pause");
         system("cls");
+        //curr_player->transfer(UNO, 0, 2);
         if(curr_player->empty()) {
             std::cout << "Player " << curr_player->get_name() << " won!" << std::endl;
             break;

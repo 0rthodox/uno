@@ -10,6 +10,7 @@ short determine_color(std::string & color);
 class field {
     sf::RenderWindow field_window;
     sf::Texture c_texture, bc_texture;
+    base_deck UNO;
     std::list<card> pack_of_cards;
     std::list<special_card> pack_of_special;
     deck main_deck;

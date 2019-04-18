@@ -50,7 +50,7 @@ void player::new_output(sf::RenderWindow & rw, sf::Vector2u position, std::vecto
     short k = 0;
     auto it = cards.begin();
     for(auto it = cards.begin(); it != cards.end(); ++it) {
-        (*it)->setPosition(xpos + float(rw.getSize().x) / 5 * (k % 5), ypos + 250 * (k / 5));
+        (*it)->setPosition(xpos + float(rw.getSize().x - 250) / 4 * (k % 5), ypos + 250 * (k / 5));
         rw.draw((*it)->get_sprite());
         displayed.push_back(it);
         ++k;
