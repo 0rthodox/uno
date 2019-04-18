@@ -253,7 +253,7 @@ void field::gameloop() {
         while(command != "PASS" || similar(command, "PASS") < 0.7) {
             std::cin >> command;
             command = make_big(command);
-            if(command == "INFO" || similar(command, "INFO") < 0.7) {
+            if(command == "INFO" || similar(command, "INFO") >= 0.7) {
                 std::cout << "Available commands:" << std::endl;
                 std::cout << "FIELD to look at field" << std::endl;
                 std::cout << "CHECK to check your cards" << std::endl;
