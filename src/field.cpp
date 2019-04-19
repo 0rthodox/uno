@@ -197,10 +197,27 @@ std::string field::new_window() {
     while(window.isOpen()) {
         sf::Event event;
         window.clear(sf::Color::White);
+        sf::Font font;
+        if (!font.loadFromFile("ARLRDBD.ttf")) {
+            std::cout << "Fail" << std::endl;
+        }
+        std::vector<sf::Text> text;
+        text.resize(2);
+        text[1].setString("PASS");
+        text[0].setString("TAKE");
         sf::CircleShape field_circle(125);
         field_circle.setFillColor(sf::Color(255, 198, 24));
         field_circle.setPosition((width - 250) / 2, (height - 1000) / 2);
         window.draw(field_circle);
+        text[0].setPosition(float(window.getSize().x - 250) / 4, field_circle.getPosition().y + 125);
+        text[1].setPosition(3 * float(window.getSize().x - 250) / 4, field_circle.getPosition().y + 125);
+        for (auto & item : text) {
+            item.setFont(font);
+            item.setCharacterSize(90);
+            item.setStyle(sf::Text::Bold);
+            item.setColor(sf::Color::Black);
+            window.draw(item);
+        }
         if(!main_deck.empty()) {
             main_deck.top()->setPosition(field_circle.getPosition().x + 55, field_circle.getPosition().y + 15);
             window.draw(main_deck.top()->get_sprite());
@@ -221,6 +238,16 @@ std::string field::new_window() {
             if(event.type == sf::Event::Closed)
                 window.close();
             else if(event.type == sf::Event::MouseButtonPressed) {
+                for(int i = 0; i < 1; ++i) {
+                    if (text[i].getGlobalBounds().contains(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y)) {
+                        if (i == 0) {
+                            take(1);
+                            return "WINDOW";
+                        }
+                        else if (i == 1)
+                            return "PASS";
+                    }
+                }
                 short at_card = curr_player->check_mouse(sf::Mouse::getPosition(window));
                 window.close();
                 if(put(at_card / 10, at_card % 10)) {
