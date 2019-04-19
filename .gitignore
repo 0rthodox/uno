@@ -2,11 +2,3 @@
 *.o
 
 *.exe
-
-*.cbp
-
-*.depend
-
-*.layout
-
-*.TTF

@@ -85,18 +85,6 @@ field::field() : main_deck(), source_deck(), players() {
     curr_player = players.begin();
 }
 
-void field::draw() {
-    field_window.create(sf::VideoMode(715, 214 * (curr_player->size() / 5 + 1) - 214 * (curr_player->size() == 15) + (244 * (!main_deck.empty()))), "FIELD", sf::Style::Titlebar);
-    field_window.setPosition(sf::Vector2i(1100, 10));
-    field_window.clear();
-    if(!main_deck.empty()) {
-        main_deck.top()->setPosition(572, 0);
-        field_window.draw(main_deck.top()->get_sprite());
-    }
-    curr_player->output_cards(field_window, main_deck.empty());
-    field_window.display();
-}
-
 void field::check_field() {
     if(main_deck.empty())
         std::cout << "Field is empty";
@@ -117,7 +105,6 @@ void field::take(short amount) {
         amount = 15 - curr_player->size();
     curr_player->transfer(source_deck, 0, amount);
     curr_player->reset_special();
-    draw();
 }
 
 bool field::put(short number, short color) {
@@ -147,7 +134,6 @@ bool field::put(short number, short color) {
 void field::check() {
     std::cout << "Your cards:" << std::endl;
     std::cout << *curr_player << std::endl;
-    draw();
 }
 
 void field::check_source() {
@@ -206,7 +192,7 @@ std::string field::new_window() {
         name.setFont(font);
         name.setCharacterSize(60);
         name.setStyle(sf::Text::Bold || sf::Text::Underlined);
-        name.setColor(sf::Color(162, 162, 208));
+        name.setFillColor(sf::Color(162, 162, 208));
         window.draw(name);
         std::vector<sf::Text> text;
         text.resize(2);
@@ -222,7 +208,8 @@ std::string field::new_window() {
             item.setFont(font);
             item.setCharacterSize(90);
             item.setStyle(sf::Text::Bold);
-            item.setColor(sf::Color::Black);
+            item.setFillColor(sf::Color::Black);
+            item.setOutlineColor(sf::Color(205, 164, 52));
             window.draw(item);
         }
         if(!main_deck.empty()) {
@@ -239,8 +226,6 @@ std::string field::new_window() {
             }
         }
         curr_player->new_output(window, sf::Vector2u(55, height - 730), displayed);
-
-
         while(window.pollEvent(event)) {
             if(event.type == sf::Event::Closed)
                 window.close();
@@ -265,7 +250,6 @@ std::string field::new_window() {
                 else
                 return "WINDOW";
             }
-
         }
         window.display();
     }
@@ -275,7 +259,6 @@ std::string field::new_window() {
 void field::gameloop() {
     while (!curr_player->empty()) {
         system("pause");
-        draw();
         system("cls");
         std::cout << curr_player->get_name() << ", it's Your turn!" << std::endl << std::endl;
         check_field();
@@ -283,17 +266,15 @@ void field::gameloop() {
         check();
         //if (curr_player->size() == 1)
             //UNO.transfer(source_deck, 0, 2);
-        std::cout << "Please input your command // INFO to learn about the commands" << std::endl;
+        //std::cout << "Please input your command // INFO to learn about the commands" << std::endl;
         std::string command = "WINDOW";
         while(command != "PASS" && !similar(command, "PASS")) {
             if(command != "WINDOW") {
                 std::cin >> command;
                 command = make_big(command);
             }
-            if(command == "WINDOW" || similar(command, "WINDOW")) {
-                field_window.close();
+            if(command == "WINDOW" || similar(command, "WINDOW"))
                 command = new_window();
-            }
             else if(command == "FIELD" || similar(command, "FIELD"))
                 check_field();
             else if(command == "TAKE" || similar(command, "TAKE")) {
@@ -359,7 +340,6 @@ void field::gameloop() {
                 std::cout << "UNO to say 'UNO'!" << std::endl;
             }
         }
-        field_window.close();
         system("pause");
         system("cls");
         //curr_player->transfer(UNO, 0, 2);

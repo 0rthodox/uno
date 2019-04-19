@@ -8,7 +8,6 @@ std::string make_big(std::string & s);
 short determine_color(std::string & color);
 
 class field {
-    sf::RenderWindow field_window;
     sf::Texture c_texture, bc_texture;
     base_deck UNO;
     std::list<card> pack_of_cards;
@@ -18,7 +17,6 @@ class field {
     std::list<player> players;
     bool reversed;
     std::list<player>::iterator curr_player;
-    void draw();
     void check_field();
     void show();
     void take(short amount);

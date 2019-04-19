@@ -1,0 +1,71 @@
+# depslib dependency file v1.0
+1552334039 source:c:\users\Никита\desktop\Папка с папками\Учёба\prog\uno_final\src\deck.cpp
+	"deck.h"
+
+1552334038 c:\users\Никита\desktop\Папка с папками\Учёба\prog\uno_final\include\deck.h
+
+1552420550 source:c:\users\Никита\desktop\Папка с папками\Учёба\prog\uno_final\main.cpp
+	"field.h"
+
+1552469657 c:\users\Никита\desktop\Папка с папками\Учёба\prog\uno_final\include\field.h
+	"player.h"
+
+1552466054 c:\users\Никита\desktop\Папка с папками\Учёба\prog\uno_final\include\player.h
+	"base_deck.h"
+
+1552334352 c:\users\Никита\desktop\Папка с папками\Учёба\prog\uno_final\include\base_deck.h
+	"card.h"
+	<list>
+	<random>
+	<chrono>
+
+1552411792 c:\users\Никита\desktop\Папка с папками\Учёба\prog\uno_final\include\card.h
+	<SFML/Graphics.hpp>
+	<iostream>
+	<string>
+
+1552338108 source:c:\users\Никита\desktop\Папка с папками\Учёба\prog\uno_final\src\base_deck.cpp
+	"base_deck.h"
+
+1552468789 source:c:\users\Никита\desktop\Папка с папками\Учёба\prog\uno_final\src\field.cpp
+	"field.h"
+
+1552466892 source:c:\users\Никита\desktop\Папка с папками\Учёба\prog\uno_final\src\player.cpp
+	"player.h"
+
+1552429135 source:c:\users\Никита\desktop\Папка с папками\Учёба\prog\uno_final\src\card.cpp
+	"card.h"
+
+1555527175 source:c:\dev\uno\main.cpp
+	"field.h"
+
+1555662973 c:\dev\uno\include\field.h
+	"player.h"
+
+1555531257 c:\dev\uno\include\player.h
+	"base_deck.h"
+
+1555350398 c:\dev\uno\include\base_deck.h
+	"card.h"
+	<list>
+	<random>
+	<chrono>
+
+1552411792 c:\dev\uno\include\card.h
+	<SFML/Graphics.hpp>
+	<iostream>
+	<string>
+
+1552429135 source:c:\dev\uno\src\card.cpp
+	"card.h"
+
+1555651266 source:c:\dev\uno\src\field.cpp
+	"field.h"
+	<set>
+
+1555616782 source:c:\dev\uno\src\player.cpp
+	"player.h"
+
+1553073724 source:c:\dev\uno\src\base_deck.cpp
+	"base_deck.h"
+
