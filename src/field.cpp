@@ -201,6 +201,13 @@ std::string field::new_window() {
         if (!font.loadFromFile("ARLRDBD.ttf")) {
             std::cout << "Fail" << std::endl;
         }
+        sf::Text name;
+        name.setString(curr_player->get_name() + ", it's your turn!");
+        name.setFont(font);
+        name.setCharacterSize(60);
+        name.setStyle(sf::Text::Bold || sf::Text::Underlined);
+        name.setColor(sf::Color(162, 162, 208));
+        window.draw(name);
         std::vector<sf::Text> text;
         text.resize(2);
         text[1].setString("PASS");
@@ -238,7 +245,7 @@ std::string field::new_window() {
             if(event.type == sf::Event::Closed)
                 window.close();
             else if(event.type == sf::Event::MouseButtonPressed) {
-                for(int i = 0; i < 1; ++i) {
+                for(int i = 0; i <= 1; ++i) {
                     if (text[i].getGlobalBounds().contains(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y)) {
                         if (i == 0) {
                             take(1);
@@ -251,12 +258,11 @@ std::string field::new_window() {
                 short at_card = curr_player->check_mouse(sf::Mouse::getPosition(window));
                 window.close();
                 if(put(at_card / 10, at_card % 10)) {
-                    std::cout << "put the card" << std::endl;
                     if(players.size() != 1)
                         affect(main_deck.top());
                     return "PASS";
                 }
-                std::cout << "failed to put the card" << std::endl;
+                else
                 return "WINDOW";
             }
 
